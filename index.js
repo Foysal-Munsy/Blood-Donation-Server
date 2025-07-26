@@ -70,6 +70,7 @@ async function run() {
     // Connect to bangladesh-geocode DB
     const bdGeoDB = client.db("bangladesh-geocode");
     districtsCollection = bdGeoDB.collection("districts");
+    upazillasCollection = bdGeoDB.collection("upazillas");
 
     // console.log(
     //   "MongoDB connected: blood_donation & bangladesh-geocode ready!"
@@ -96,6 +97,14 @@ app.get("/districts", async (req, res) => {
     res.json(districts);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch districts", error });
+  }
+});
+app.get("/upazillas", async (req, res) => {
+  try {
+    const upazillas = await upazillasCollection.find().toArray();
+    res.json(upazillas);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch upazillas", error });
   }
 });
 
