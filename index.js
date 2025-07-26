@@ -56,11 +56,24 @@ const verifyFirebaseToken = async (req, res, next) => {
   }
 };
 
+let eventsCollection; // <-- blood_donation/collection1
+let districtsCollection; // <-- bangladesh-geocode/districts
 async function run() {
   try {
     await client.connect();
-    const db = client.db("blood_donation");
-    const events = db.collection("collection1");
+    // const db = client.db("blood_donation");
+    // const events = db.collection("collection1");
+    // Connect to blood_donation DB
+    const bloodDonationDB = client.db("blood_donation");
+    eventsCollection = bloodDonationDB.collection("collection1");
+
+    // Connect to bangladesh-geocode DB
+    const bdGeoDB = client.db("bangladesh-geocode");
+    districtsCollection = bdGeoDB.collection("districts");
+
+    // console.log(
+    //   "MongoDB connected: blood_donation & bangladesh-geocode ready!"
+    // );
   } finally {
   }
 }
@@ -73,6 +86,17 @@ app.get("/", verifyFirebaseToken, async (req, res) => {
   console.log(req.firebaseUser);
 
   res.send("Server is running!");
+});
+
+// Fetch all bd code
+
+app.get("/districts", async (req, res) => {
+  try {
+    const districts = await districtsCollection.find().toArray();
+    res.json(districts);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch districts", error });
+  }
 });
 
 app.listen(PORT, () => {
