@@ -47,6 +47,7 @@ const verifyFirebaseToken = async (req, res, next) => {
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
+    console.log("🚀 ~ verifyFirebaseToken ~ decodedToken:", decodedToken);
     req.firebaseUser = decodedToken; // You can access user info like uid, email, etc.
     next();
   } catch (error) {
@@ -63,6 +64,17 @@ async function run() {
     const bloodDonationDB = client.db("blood_donation");
     const usersCollection = bloodDonationDB.collection("users");
 
+    const verifyAdmin = async (req, res, next) => {
+      const user = await usersCollection.findOne({
+        email: req.firebaseUser.email,
+      });
+
+      if (user.role === "admin") {
+        next();
+      } else {
+        res.status(403).send({ msg: "unauthorized" });
+      }
+    };
     app.post("/add-user", async (req, res) => {
       const userData = req.body;
       const find_result = await usersCollection.findOne({
@@ -89,6 +101,18 @@ async function run() {
       });
       res.send({ msg: "ok", role: user.role, status: "active" });
     });
+
+    app.get(
+      "/get-users",
+      verifyFirebaseToken,
+      verifyAdmin,
+      async (req, res) => {
+        const users = await usersCollection
+          .find({ email: { $ne: req.firebaseUser.email } })
+          .toArray();
+        res.send(users);
+      }
+    );
 
     // Connect to bangladesh-geocode DB
 
