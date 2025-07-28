@@ -63,6 +63,8 @@ async function run() {
     // Connect to blood_donation DB
     const bloodDonationDB = client.db("blood_donation");
     const usersCollection = bloodDonationDB.collection("users");
+    const donationRequestCollection =
+      bloodDonationDB.collection("donationRequest");
 
     const verifyAdmin = async (req, res, next) => {
       const user = await usersCollection.findOne({
@@ -100,6 +102,13 @@ async function run() {
         email: req.firebaseUser.email,
       });
       res.send({ msg: "ok", role: user.role, status: "active" });
+    });
+    app.get("/get-user-status", verifyFirebaseToken, async (req, res) => {
+      const user = await usersCollection.findOne(
+        { email: req.firebaseUser.email },
+        { projection: { status: 1, _id: 0 } } // only get status field, exclude _id
+      );
+      res.send({ status: user.status });
     });
 
     app.get(
@@ -147,6 +156,12 @@ async function run() {
         res.send(result);
       }
     );
+
+    app.post("/create-donation-request", async (req, res) => {
+      const data = req.body;
+      const result = await donationRequestCollection.insertOne(data);
+      res.send(result);
+    });
 
     // Connect to bangladesh-geocode DB
 
