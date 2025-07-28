@@ -56,22 +56,64 @@ const verifyFirebaseToken = async (req, res, next) => {
   }
 };
 
-let eventsCollection; // <-- blood_donation/collection1
-let districtsCollection; // <-- bangladesh-geocode/districts
 async function run() {
   try {
     await client.connect();
-    // const db = client.db("blood_donation");
-    // const events = db.collection("collection1");
     // Connect to blood_donation DB
     const bloodDonationDB = client.db("blood_donation");
-    eventsCollection = bloodDonationDB.collection("collection1");
+    const usersCollection = bloodDonationDB.collection("users");
+
+    app.post("/add-user", async (req, res) => {
+      const userData = req.body;
+      const find_result = await usersCollection.findOne({
+        email: userData.email,
+      });
+
+      if (find_result) {
+        usersCollection.updateOne(
+          { email: userData.email },
+          {
+            $inc: { loginCount: 1 },
+          }
+        );
+        res.send({ msg: "user already exist" });
+      } else {
+        const result = await usersCollection.insertOne(userData);
+        res.send(result);
+      }
+    });
 
     // Connect to bangladesh-geocode DB
-    const bdGeoDB = client.db("bangladesh-geocode");
-    districtsCollection = bdGeoDB.collection("districts");
-    upazillasCollection = bdGeoDB.collection("upazillas");
 
+    const bdGeoDB = client.db("bangladesh-geocode");
+    const districtsCollection = bdGeoDB.collection("districts");
+    const upazilasCollection = bdGeoDB.collection("upazilas");
+    // Fetch all districts
+    app.get("/districts", async (req, res) => {
+      try {
+        const districts = await districtsCollection.find().toArray();
+        res.json(districts);
+      } catch (error) {
+        res.status(500).json({ message: "Failed to fetch districts", error });
+      }
+    });
+
+    // Fetch upazilas (with optional district filter)
+    app.get("/upazilas", async (req, res) => {
+      try {
+        const { district_id } = req.query; // e.g., /upazilas?district_id=1
+        let query = {};
+
+        if (district_id) {
+          query = { district_id: district_id };
+        }
+
+        const upazilas = await upazilasCollection.find(query).toArray();
+        res.json(upazilas);
+      } catch (error) {
+        res.status(500).json({ message: "Failed to fetch upazilas", error });
+      }
+    });
     // console.log(
     //   "MongoDB connected: blood_donation & bangladesh-geocode ready!"
     // );
@@ -83,29 +125,8 @@ run().catch(console.dir);
 
 // Root route
 
-app.get("/", verifyFirebaseToken, async (req, res) => {
-  console.log(req.firebaseUser);
-
+app.get("/", async (req, res) => {
   res.send("Server is running!");
-});
-
-// Fetch all bd code
-
-app.get("/districts", async (req, res) => {
-  try {
-    const districts = await districtsCollection.find().toArray();
-    res.json(districts);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch districts", error });
-  }
-});
-app.get("/upazillas", async (req, res) => {
-  try {
-    const upazillas = await upazillasCollection.find().toArray();
-    res.json(upazillas);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch upazillas", error });
-  }
 });
 
 app.listen(PORT, () => {
