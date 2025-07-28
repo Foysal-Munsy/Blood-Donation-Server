@@ -130,6 +130,23 @@ async function run() {
         res.send(result);
       }
     );
+    app.patch(
+      "/update-status",
+      verifyFirebaseToken,
+      verifyAdmin,
+      async (req, res) => {
+        const { email, status } = req.body;
+
+        const result = await usersCollection.updateOne(
+          { email: email },
+          {
+            $set: { status },
+          }
+        );
+
+        res.send(result);
+      }
+    );
 
     // Connect to bangladesh-geocode DB
 
