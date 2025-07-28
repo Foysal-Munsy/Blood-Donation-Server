@@ -114,6 +114,23 @@ async function run() {
       }
     );
 
+    app.patch(
+      "/update-role",
+      verifyFirebaseToken,
+      verifyAdmin,
+      async (req, res) => {
+        const { email, role } = req.body;
+        const result = await usersCollection.updateOne(
+          { email: email },
+          {
+            $set: { role },
+          }
+        );
+
+        res.send(result);
+      }
+    );
+
     // Connect to bangladesh-geocode DB
 
     const bdGeoDB = client.db("bangladesh-geocode");
