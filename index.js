@@ -83,6 +83,13 @@ async function run() {
       }
     });
 
+    app.get("/get-user-role", verifyFirebaseToken, async (req, res) => {
+      const user = await usersCollection.findOne({
+        email: req.firebaseUser.email,
+      });
+      res.send({ msg: "ok", role: user.role, status: "active" });
+    });
+
     // Connect to bangladesh-geocode DB
 
     const bdGeoDB = client.db("bangladesh-geocode");
