@@ -193,7 +193,7 @@ async function run() {
       const data = await donationRequestCollection.find(query).toArray();
       res.send(data);
     });
-    app.get("/all-donation-requests", async (req, res) => {
+    app.get("/all-donation-requests", verifyFirebaseToken, async (req, res) => {
       const data = await donationRequestCollection.find().toArray();
       res.send(data);
     });
@@ -201,6 +201,10 @@ async function run() {
       const data = req.body;
       const result = await blogsCollection.insertOne(data);
       res.send(result);
+    });
+    app.get("/get-blogs", verifyFirebaseToken, async (req, res) => {
+      const data = await blogsCollection.find().toArray();
+      res.send(data);
     });
 
     // Connect to bangladesh-geocode DB
