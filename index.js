@@ -207,29 +207,12 @@ async function run() {
       res.send(data);
     });
 
-    // app.patch(
-    //   "/update-blog-status",
-    //   verifyFirebaseToken,
-    //   verifyAdmin,
-    //   async (req, res) => {
-    //     const { email, status } = req.body;
-
-    //     const result = await blogsCollection.updateOne(
-    //       { email: email },
-    //       {
-    //         $set: { status },
-    //       }
-    //     );
-
-    //     res.send(result);
-    //   }
-    // );
     app.patch(
       "/update-blog-status",
       verifyFirebaseToken,
       verifyAdmin,
       async (req, res) => {
-        const { id, status } = req.body; // get blog id, not email
+        const { id, status } = req.body;
 
         const result = await blogsCollection.updateOne(
           { _id: new ObjectId(id) }, // filter by _id
@@ -239,6 +222,17 @@ async function run() {
         res.send(result);
       }
     );
+    app.delete("/delete-blog/:id", verifyFirebaseToken, async (req, res) => {
+      const id = req.params.id;
+
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({ error: "Invalid blog ID" });
+      }
+
+      const query = { _id: new ObjectId(id) };
+      const result = await blogsCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // Connect to bangladesh-geocode DB
 
