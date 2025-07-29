@@ -122,6 +122,17 @@ async function run() {
 
       res.send(user);
     });
+    app.patch("/update-user/:id", verifyFirebaseToken, async (req, res) => {
+      const { id } = req.params;
+      const updatedData = req.body;
+
+      const result = await usersCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedData }
+      );
+
+      res.send(result);
+    });
 
     // all users without currently logged in admin
     app.get(
@@ -179,6 +190,10 @@ async function run() {
     app.get("/my-donation-request", verifyFirebaseToken, async (req, res) => {
       const query = { requesterEmail: req.firebaseUser.email };
       const data = await donationRequestCollection.find(query).toArray();
+      res.send(data);
+    });
+    app.get("/all-donation-requests", async (req, res) => {
+      const data = await donationRequestCollection.find().toArray();
       res.send(data);
     });
 
