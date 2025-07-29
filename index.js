@@ -207,6 +207,39 @@ async function run() {
       res.send(data);
     });
 
+    // app.patch(
+    //   "/update-blog-status",
+    //   verifyFirebaseToken,
+    //   verifyAdmin,
+    //   async (req, res) => {
+    //     const { email, status } = req.body;
+
+    //     const result = await blogsCollection.updateOne(
+    //       { email: email },
+    //       {
+    //         $set: { status },
+    //       }
+    //     );
+
+    //     res.send(result);
+    //   }
+    // );
+    app.patch(
+      "/update-blog-status",
+      verifyFirebaseToken,
+      verifyAdmin,
+      async (req, res) => {
+        const { id, status } = req.body; // get blog id, not email
+
+        const result = await blogsCollection.updateOne(
+          { _id: new ObjectId(id) }, // filter by _id
+          { $set: { status } }
+        );
+
+        res.send(result);
+      }
+    );
+
     // Connect to bangladesh-geocode DB
 
     const bdGeoDB = client.db("bangladesh-geocode");
