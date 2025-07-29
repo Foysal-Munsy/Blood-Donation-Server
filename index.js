@@ -110,7 +110,20 @@ async function run() {
       );
       res.send({ status: user.status });
     });
+    // currently logged in user
+    app.get("/get-user", verifyFirebaseToken, async (req, res) => {
+      const user = await usersCollection.findOne({
+        email: req.firebaseUser.email,
+      });
 
+      if (!user) {
+        return res.status(404).send({ message: "User not found" });
+      }
+
+      res.send(user);
+    });
+
+    // all users without currently logged in admin
     app.get(
       "/get-users",
       verifyFirebaseToken,
