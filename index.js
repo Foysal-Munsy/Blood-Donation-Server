@@ -63,6 +63,7 @@ async function run() {
     // Connect to blood_donation DB
     const bloodDonationDB = client.db("blood_donation");
     const usersCollection = bloodDonationDB.collection("users");
+    const blogsCollection = bloodDonationDB.collection("blogs");
     const donationRequestCollection =
       bloodDonationDB.collection("donationRequest");
 
@@ -195,6 +196,11 @@ async function run() {
     app.get("/all-donation-requests", async (req, res) => {
       const data = await donationRequestCollection.find().toArray();
       res.send(data);
+    });
+    app.post("/add-blog", async (req, res) => {
+      const data = req.body;
+      const result = await blogsCollection.insertOne(data);
+      res.send(result);
     });
 
     // Connect to bangladesh-geocode DB
