@@ -163,6 +163,12 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/my-donation-request", verifyFirebaseToken, async (req, res) => {
+      const query = { requesterEmail: req.firebaseUser.email };
+      const data = await donationRequestCollection.find(query).toArray();
+      res.send(data);
+    });
+
     // Connect to bangladesh-geocode DB
 
     const bdGeoDB = client.db("bangladesh-geocode");
