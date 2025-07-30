@@ -84,6 +84,10 @@ async function run() {
       const result = await donorInfoCollection.insertOne(data);
       res.send(result);
     });
+    app.get("/find-donor", verifyFirebaseToken, async (req, res) => {
+      const data = await donorInfoCollection.find().toArray();
+      res.send(data);
+    });
     app.post("/add-user", async (req, res) => {
       const userData = req.body;
       const find_result = await usersCollection.findOne({
