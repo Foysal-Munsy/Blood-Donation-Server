@@ -85,7 +85,8 @@ async function run() {
       res.send(result);
     });
     app.get("/find-donor", verifyFirebaseToken, async (req, res) => {
-      const data = await donorInfoCollection.find().toArray();
+      const { donationId } = req.query;
+      const data = await donorInfoCollection.find({ donationId }).toArray();
       res.send(data);
     });
     app.post("/add-user", async (req, res) => {
@@ -269,6 +270,18 @@ async function run() {
 
       const query = { _id: new ObjectId(id) };
       const result = await blogsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.delete("/delete-request/:id", async (req, res) => {
+      const id = req.params.id;
+
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send({ error: "Invalid blog ID" });
+      }
+
+      const query = { _id: new ObjectId(id) };
+      const result = await donationRequestCollection.deleteOne(query);
       res.send(result);
     });
 
