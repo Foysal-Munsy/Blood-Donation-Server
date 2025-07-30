@@ -223,6 +223,13 @@ async function run() {
       res.send(data);
     });
 
+    app.get("/get-blogs-public", async (req, res) => {
+      const data = await blogsCollection
+        .find({ status: "published" })
+        .toArray();
+      res.send(data);
+    });
+
     app.patch(
       "/update-blog-status",
       verifyFirebaseToken,
