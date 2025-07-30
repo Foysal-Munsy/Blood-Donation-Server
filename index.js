@@ -203,6 +203,15 @@ async function run() {
       const data = await donationRequestCollection.findOne(query);
       res.send(data);
     });
+    app.patch("/donation-status", verifyFirebaseToken, async (req, res) => {
+      const { id, donationStatus } = req.body;
+      const result = await donationRequestCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { donationStatus } }
+      );
+
+      res.send(result);
+    });
 
     app.post("/add-blog", async (req, res) => {
       const data = req.body;
