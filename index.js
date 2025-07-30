@@ -64,6 +64,7 @@ async function run() {
     const bloodDonationDB = client.db("blood_donation");
     const usersCollection = bloodDonationDB.collection("users");
     const blogsCollection = bloodDonationDB.collection("blogs");
+    const donorInfoCollection = bloodDonationDB.collection("donorInfo");
     const donationRequestCollection =
       bloodDonationDB.collection("donationRequest");
 
@@ -78,12 +79,16 @@ async function run() {
         res.status(403).send({ msg: "unauthorized" });
       }
     };
+    app.post("/add-donor", async (req, res) => {
+      const data = req.body;
+      const result = await donorInfoCollection.insertOne(data);
+      res.send(result);
+    });
     app.post("/add-user", async (req, res) => {
       const userData = req.body;
       const find_result = await usersCollection.findOne({
         email: userData.email,
       });
-
       if (find_result) {
         usersCollection.updateOne(
           { email: userData.email },
@@ -196,6 +201,12 @@ async function run() {
     });
     app.get("/all-donation-requests", verifyFirebaseToken, async (req, res) => {
       const data = await donationRequestCollection.find().toArray();
+      res.send(data);
+    });
+    app.get("/all-donation-requests-public", async (req, res) => {
+      const data = await donationRequestCollection
+        .find({ donationStatus: "pending" })
+        .toArray();
       res.send(data);
     });
     app.get("/details/:id", verifyFirebaseToken, async (req, res) => {
