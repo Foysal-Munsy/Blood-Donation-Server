@@ -123,6 +123,7 @@ async function run() {
 
       res.send(user);
     });
+
     app.patch("/update-user/:id", verifyFirebaseToken, async (req, res) => {
       const { id } = req.params;
       const updatedData = req.body;
@@ -197,6 +198,12 @@ async function run() {
       const data = await donationRequestCollection.find().toArray();
       res.send(data);
     });
+    app.get("/details/:id", verifyFirebaseToken, async (req, res) => {
+      const query = { _id: new ObjectId(req.params.id) };
+      const data = await donationRequestCollection.findOne(query);
+      res.send(data);
+    });
+
     app.post("/add-blog", async (req, res) => {
       const data = req.body;
       const result = await blogsCollection.insertOne(data);
