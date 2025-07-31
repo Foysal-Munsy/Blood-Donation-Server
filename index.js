@@ -219,16 +219,41 @@ async function run() {
       const data = await donationRequestCollection.findOne(query);
       res.send(data);
     });
+
     app.patch("/donation-status", verifyFirebaseToken, async (req, res) => {
       const { id, donationStatus } = req.body;
       const result = await donationRequestCollection.updateOne(
         { _id: new ObjectId(id) },
         { $set: { donationStatus } }
       );
-
       res.send(result);
     });
+    app.get(
+      "/get-donation-request/:ID",
+      verifyFirebaseToken,
+      async (req, res) => {
+        const query = { _id: new ObjectId(req.params.ID) };
+        const data = await donationRequestCollection.findOne(query);
+        res.send(data);
+      }
+    );
+    app.put(
+      "/update-donation-request/:ID",
+      verifyFirebaseToken,
+      async (req, res) => {
+        const { ID } = req.params;
+        const updatedRequest = req.body;
 
+        const filter = { _id: new ObjectId(ID) };
+        const updateDoc = { $set: updatedRequest };
+
+        const result = await donationRequestCollection.updateOne(
+          filter,
+          updateDoc
+        );
+        res.send(result);
+      }
+    );
     app.post("/add-blog", async (req, res) => {
       const data = req.body;
       const result = await blogsCollection.insertOne(data);
