@@ -263,6 +263,11 @@ async function run() {
       const data = await blogsCollection.find().toArray();
       res.send(data);
     });
+    app.get("/blog-details/:ID", verifyFirebaseToken, async (req, res) => {
+      const query = { _id: new ObjectId(req.params.ID) };
+      const data = await blogsCollection.findOne(query);
+      res.send(data);
+    });
 
     app.get("/get-blogs-public", async (req, res) => {
       const data = await blogsCollection
