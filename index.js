@@ -158,6 +158,10 @@ async function run() {
         res.send(users);
       }
     );
+    app.get("/get-donors", async (req, res) => {
+      const users = await usersCollection.find({ role: "donor" }).toArray();
+      res.send(users);
+    });
     app.get(
       "/get-users-for-volunteer",
       verifyFirebaseToken,
