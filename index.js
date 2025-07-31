@@ -158,6 +158,16 @@ async function run() {
         res.send(users);
       }
     );
+    app.get(
+      "/get-users-for-volunteer",
+      verifyFirebaseToken,
+      async (req, res) => {
+        const users = await usersCollection
+          .find({ email: { $ne: req.firebaseUser.email } })
+          .toArray();
+        res.send(users);
+      }
+    );
 
     app.patch(
       "/update-role",
