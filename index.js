@@ -228,6 +228,7 @@ async function run() {
         .toArray();
       res.send(data);
     });
+    // a trigger
     app.get("/details/:id", verifyFirebaseToken, async (req, res) => {
       const query = { _id: new ObjectId(req.params.id) };
       const data = await donationRequestCollection.findOne(query);
