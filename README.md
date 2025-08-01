@@ -6,7 +6,7 @@ This is the **backend server** for the **RedDrop** platform – a full-featured 
 
 ## 🌐 Live Server URL
 
-📡 [https://bloodbond-server.vercel.app](https://bloodbond-server.vercel.app)
+📡 [https://blood-donation-app-ff014.web.app/](https://blood-donation-app-ff014.web.app/)
 
 ---
 
