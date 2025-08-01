@@ -59,7 +59,6 @@ const verifyFirebaseToken = async (req, res, next) => {
 
 async function run() {
   try {
-    await client.connect();
     // Connect to blood_donation DB
     const bloodDonationDB = client.db("blood_donation");
     const usersCollection = bloodDonationDB.collection("users");
@@ -372,7 +371,7 @@ run().catch(console.dir);
 
 // Root route
 
-app.get("/", async (req, res) => {
+app.get("/", verifyFirebaseToken, async (req, res) => {
   res.send("Server is running!");
 });
 
